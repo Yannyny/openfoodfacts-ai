@@ -14,7 +14,7 @@ def load_dataset(path, as_dict=False):
     original_path = path / "original.txt"
     with original_path.open("r", encoding="utf-8") as original_file:
         original_lines = original_file.readlines()
-
+       # print(original_lines[:4])
     correct_path = path / "correct.txt"
     with correct_path.open("r", encoding="utf-8") as correct_file:
         correct_lines = correct_file.readlines()
@@ -42,6 +42,7 @@ def load_dataset(path, as_dict=False):
                 "tags": tags,
             }
         )
+    #print(items[:3])
 
     prediction_path = path / "prediction.txt"
     if prediction_path.exists():

@@ -185,9 +185,9 @@ class Word:
         
     def __repr__(self):
         if self.included_in_nutrition_table:
-            return "Word: {}, Bounding Box: {}, included".format(self.description, self.bounding_box)
+            return "'Word': {}, 'Bounding Box': {}, included".format(self.description, self.bounding_box) #ajout de '' autour de Word et Bounding Box
         else:
-            return "Word: {}, Bounding Box: {}, not included".format(self.description, self.bounding_box)
+            return "'Word': {}, 'Bounding Box': {}, not included".format(self.description, self.bounding_box)
     
     
     @staticmethod

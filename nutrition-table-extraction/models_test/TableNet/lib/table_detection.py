@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import tensorflow as tf
 import cv2
 import numpy as np
@@ -201,6 +202,7 @@ class TableMask:
             self.resized_bounding_box = (0,0,0,0)
 
     def generate_corrected_mask(self):
+        #print(self.resized_bounding_box)
         self.corrected_mask = cv2.resize(get_mask_from_bounding_box(self.resized_bounding_box,(256,256,3)),self.original_image_shape)
     
     def get_bounding_box_coordinates_on_original_image(self):
@@ -267,6 +269,7 @@ class Pipeline:
                 image = tf.expand_dims(img_tensor,axis=0)
                 _ , predicted_rotated_column_mask = get_masks(self.model,image)
                 self.predicted_line_mask = 255*cv2.rotate(predicted_rotated_column_mask.numpy().reshape(256,256),cv2.ROTATE_90_CLOCKWISE)
+                #Get Column prediction mask from previously with predict()
                 self.predicted_column_mask = self.predicted_column_masks[-1]
                 break
             else:
@@ -302,6 +305,9 @@ class Signal:
     
     def find_peaks(self,method='std',distance=None):
         self.processed_signal = self.process_signal()
+        #plt.plot(self.processed_signal)
+        #plt.ylabel('processed signal')
+        #plt.show()
         #processed_signal = np.insert(self.signal,0,0) #add a 0 to consider first peak
         
         if method=='std':
@@ -337,7 +343,7 @@ class LineDetection:
         return y/N
     
     
-    def find_peaks(self, window_size, distance,axis, method='std'):
+    def find_peaks(self, window_size, distance, axis, method='std'):
         vertical_sum = self.mask.sum(axis=axis)
         signal = self.runningMean(vertical_sum,window_size)
         self.signal = Signal(signal)
@@ -359,6 +365,7 @@ class Table:
         self.lines = None
         self.table = []
         
+    
     
     def find_columns(self,window_size, min_distance_between_peaks, method):
         preprocessed_column_mask = process_column_mask(self.column_mask.astype(np.uint8))

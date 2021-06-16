@@ -20,17 +20,19 @@ class RobotoffAPIModel(BaseModel):
     def name(self):
         return f"RobotoffAPI__index_{self.index}__conf_{self.confidence}"
 
-    def apply_one(self, text: str) -> str:
-        return get_correction(text, self.get_params(text=text))
+    def apply_one(self, text: str) -> str: #[self.apply_one(item["original"]) for item in items]
+        return get_correction(text, self.get_params(text=text)) #index="product", confidence=1
 
     def get_params(self, **kwargs):
-        return {"index": self.index, "confidence": self.confidence, **kwargs}
+        return {**kwargs, "index": self.index, "confidence": self.confidence}
 
 
 @memory.cache
 def get_correction(text: str, params: Dict) -> str:
     try:
+        #print(params)
         r = requests.get(URL, params=params)
+        #print(r.url)
         data = r.json()
         if data["corrected"] != "":
             return data["corrected"]

@@ -20,16 +20,16 @@ class ImageWordsReader:
 
     def _parse_function(self, example_proto):
         keys_to_features = {
-            'image': tf.FixedLenFeature((self.max_height * self.max_width), tf.float32),
-            'global_features': tf.FixedLenFeature((self.len_global_features), tf.float32),
-            'vertex_features': tf.FixedLenFeature((self.num_max_vertices * self.num_data_dims), tf.float32),
+            'image': tf.io.FixedLenFeature((self.max_height * self.max_width), tf.float32), #ajout tf."io.".FixedLenFeature
+            'global_features': tf.io.FixedLenFeature((self.len_global_features), tf.float32),
+            'vertex_features': tf.io.FixedLenFeature((self.num_max_vertices * self.num_data_dims), tf.float32),
 
-            'adjacency_matrix_cells': tf.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
-            'adjacency_matrix_rows': tf.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
-            'adjacency_matrix_cols': tf.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
-            'vertex_text': tf.FixedLenFeature((self.num_max_vertices * self.max_word_length), tf.int64),
+            'adjacency_matrix_cells': tf.io.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
+            'adjacency_matrix_rows': tf.io.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
+            'adjacency_matrix_cols': tf.io.FixedLenFeature((self.num_max_vertices * self.num_max_vertices), tf.int64),
+            'vertex_text': tf.io.FixedLenFeature((self.num_max_vertices * self.max_word_length), tf.int64),
         }
-        parsed_features = tf.parse_single_example(example_proto, keys_to_features)
+        parsed_features = tf.io.parse_single_example(example_proto, keys_to_features) #idem
 
         return parsed_features['vertex_features'], parsed_features['vertex_text'], parsed_features['image'], \
                parsed_features['global_features'], parsed_features['adjacency_matrix_cells'], \
@@ -48,7 +48,7 @@ class ImageWordsReader:
         """
         # print("Max height", self.max_height)
         # print("Max width", self.max_width)
-        # print("Len global features", self.len_global_features)
+        print("Len global features", self.len_global_features)
         # print("Max vertices", self.num_max_vertices)
         # print("Data dims", self.num_data_dims)
         # print("Max word length", self.max_word_length)
@@ -56,15 +56,15 @@ class ImageWordsReader:
         with open(self.files_list) as f:
             content = f.readlines()
         file_paths = [x.strip() for x in content]
-        #dataset = tf.data.TFRecordDataset(file_paths, compression_type='GZIP')
-        dataset = tf.data.TFRecordDataset(file_paths, compression_type=None)
+        dataset = tf.data.TFRecordDataset(file_paths, compression_type='GZIP')
+        #dataset = tf.data.TFRecordDataset(file_paths, compression_type=None)
         dataset = dataset.map(self._parse_function)
         if shuffle:
             dataset = dataset.shuffle(
                 buffer_size=self.shuffle_size)
         dataset = dataset.repeat(None if self.repeat else 10000)
         dataset = dataset.batch(self.num_batch)
-        iterator = dataset.make_one_shot_iterator()
+        iterator = iter(dataset) #dataset.make_one_shot_iterator()
         vertex_features, vertex_text, image, global_features, adj_cells, adj_rows, adj_cols = iterator.get_next()
 
         vertex_features = tf.reshape(vertex_features, shape=(-1, self.num_max_vertices, self.num_data_dims))

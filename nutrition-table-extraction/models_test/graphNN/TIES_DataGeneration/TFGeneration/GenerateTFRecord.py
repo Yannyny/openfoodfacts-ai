@@ -15,7 +15,8 @@ import random
 import argparse
 from TableGeneration.tools import *
 import numpy as np
-from selenium.webdriver import Firefox
+from selenium.webdriver import Firefox, Chrome
+from selenium.webdriver.firefox.firefox_binary import *
 from selenium.webdriver import PhantomJS
 import warnings
 from TableGeneration.Transformation import *
@@ -157,6 +158,7 @@ class GenerateTFRecord:
                 while(True):
                     #This loop is to repeat and retry generating image if some an exception is encountered.
                     try:
+                        print('\nloop'+str(exceptcount))
                         #initialize table class
                         table = Table(rows,cols,self.unlvimagespath,self.unlvocrpath,self.unlvtablepath,assigned_category+1,self.distributionfile)
                         #get table of rows and cols based on unlv distribution and get features of this table
@@ -166,7 +168,7 @@ class GenerateTFRecord:
                         #convert this html code to image using selenium webdriver. Get equivalent bounding boxes
                         #for each word in the table. This will generate ground truth for our problem
                         im,bboxes = html_to_img(driver, html_content, id_count)
-
+                        #im = np.asanyarray(im) #ajout
                         # apply_shear: bool - True: Apply Transformation, False: No Transformation | probability weight for shearing to be 25%
                         #apply_shear = random.choices([True, False],weights=[0.25,0.75])[0]
                         
@@ -201,7 +203,7 @@ class GenerateTFRecord:
                         #print('Assigned category: ',assigned_category+1,', generated category: ',tablecategory)
                         break
                     except Exception as e:
-                        #traceback.print_exc()
+                        traceback.print_exc()
                         exceptcount+=1
                         if(exceptioncount>10):
                             print('More than 10 exceptions occured for file: ',output_file_name)
@@ -254,10 +256,11 @@ class GenerateTFRecord:
         '''This function writes tfrecords. Input parameters are: filesize (number of images in one tfrecord), threadnum(thread id)'''
         options = tf.compat.v1.io.TFRecordOptions(tf.compat.v1.io.TFRecordCompressionType.GZIP)
         opts = Options()
+        binary = r'C:\Users\ytremenbert\AppData\Local\Mozilla Firefox\firefox.exe' #ajout
         opts.set_headless()
         assert opts.headless
         #driver=PhantomJS()
-        driver = Firefox(options=opts)
+        driver = Firefox(firefox_binary=binary) #options=opts, firefox_binary=binary)
 
         while(True):
             starttime = time.time()
@@ -267,12 +270,19 @@ class GenerateTFRecord:
             print('\nThread: ',threadnum,' Started:', output_file_name)
 
             #data_arr contains the images of generated tables and all_table_categories contains the table category of each of the table
+            print('\ncc')
             data_arr,all_table_categories = self.generate_tables(driver, filesize, output_file_name)
+            print('\ncc ')
             if(data_arr is not None):
+                print('je ')
                 if(len(data_arr)==filesize):
+                    print('suis ')
                     with tf.io.TFRecordWriter(os.path.join(self.outtfpath,output_file_name),options=options) as writer:
+                        print('Yann ')
                         try:
+                            print('Trem')
                             for imgindex,subarr in enumerate(data_arr):
+                                print('enbert ')
                                 arr=subarr[0]
 
                                 img=np.asarray(subarr[1][0],np.int64)[:,:,0]

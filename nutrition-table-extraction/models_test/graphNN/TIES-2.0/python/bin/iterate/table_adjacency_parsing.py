@@ -1,3 +1,6 @@
+import sys
+sys.path.append('C:/Users/ytremenbert/fact-extraction/openfoodfacts-ai/nutrition-table-extraction/models_test/graphNN/TIES-2.0/python')
+sys.path.append('C:/Users/ytremenbert/fact-extraction/openfoodfacts-ai/nutrition-table-extraction/models_test/graphNN/caloGraphNN')
 import argparse
 from iterators.table_adjacency_parsing_iterator import TableAdjacencyParsingIterator
 from libs.configuration_manager import ConfigurationManager as gconfig

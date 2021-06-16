@@ -24,7 +24,7 @@ class RegexModel(BaseModel):
 
     def _load_replacements(self):
         replacements = {}
-        with patterns_path.open() as f:
+        with patterns_path.open(encoding="utf8") as f:
             current_replacement = None
             for line in f.readlines():
                 line = line.strip()

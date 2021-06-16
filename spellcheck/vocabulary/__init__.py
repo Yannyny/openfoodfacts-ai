@@ -20,7 +20,7 @@ class Vocabulary(object):
         if voc_name is not None:
             try:
                 path = file_path.parent / self.FILENAMES[voc_name]
-                with path.open("r") as f:
+                with path.open("r", encoding="utf8") as f:
                     self.voc = set(
                         self.normalize(token) for token in f.read().split("\n")
                     )

@@ -133,6 +133,5 @@ $ source ties.sh
 
 
 ## Coming soon
-
 1. Training data uploaded
 2. Trained models

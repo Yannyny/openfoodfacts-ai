@@ -27,13 +27,14 @@ models = [
     #         RobotoffAPIModel(index="product", confidence=1),
     #     ]
     # ),
-    # PipelineModel(
-    #     models=[
-    #         RegexModel("replacements"),
-    #         RobotoffAPIModel(index="product", confidence=1),
-    #         RegexModel("vocabulary"),
-    #     ]
-    # ),
+     PipelineModel(
+         models=[
+             RegexModel("replacements"),
+             RegexModel("percentages"),
+             RobotoffAPIModel(index="product_all", confidence=0.5),
+             RegexModel("vocabulary"),
+         ]
+     ),
     # RobotoffAPIModel(index="product", confidence=1),
     # RobotoffAPIModel(index="product_all", confidence=1),
     # RobotoffAPIModel(index="product_extended", confidence=1),
@@ -54,6 +55,7 @@ models = [
 ]
 
 items = load_dataset(FR_TEST_SET_PATH)
+#print(items[:4])
 valid_items = [item for item in items if item["tags"] == ["VALID"]]
 
 for model in models:

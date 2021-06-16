@@ -32,6 +32,21 @@ def create_mask(pred_mask1, pred_mask2):
     pred_mask2 = pred_mask2[..., tf.newaxis]
     return pred_mask1[0], pred_mask2[0]
 
+def show_predictions(model, dataset=None, num=1):
+    if dataset:
+        for images_batch in dataset.take(num):
+            pred_mask1, pred_mask2 = model.predict(images_batch, verbose=1)
+            #print(pred_mask1)
+            table_mask, column_mask = create_mask(pred_mask1, pred_mask2)
+            #print(table_mask)
+            display([images_batch[0], table_mask, column_mask])
+            #print("dataset path")
+    else:
+        pred_mask1, pred_mask2 = model.predict(sample_image, verbose=1)
+        table_mask, column_mask = create_mask(pred_mask1, pred_mask2)
+        display([sample_image[0], table_mask, column_mask])
+        print("else path")
+
 def get_masks(model, image):
     pred_mask1, pred_mask2 = model.predict(image)
     table_mask, column_mask = create_mask(pred_mask1, pred_mask2)

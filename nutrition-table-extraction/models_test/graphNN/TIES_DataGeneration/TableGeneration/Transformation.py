@@ -14,7 +14,8 @@ def resize_image(img,offsets,size):
     newimg = Image.new('RGBA',
                      (int(size[0]), int(size[1])),  # A4 at 72dpi
                      (255, 255, 255,255))  # White
-    newimg.paste(img, offsets)  # Not centered, top-left corner
+    #im=Image.open(img) #Ajout
+    newimg.paste(img, offsets)  # Not centered, top-left corner #avant im <- img
     return newimg
 
 def pad_original_image(img,transformation_matrix,max_width,max_height):
@@ -86,8 +87,8 @@ def Transform(img,bboxes,shearval,rotval,max_width,max_height):
     max_pts = np.dot(max_pts, points_transformation.params.T)[:,:2]
 
     transformed_bboxes=np.concatenate((min_pts,max_pts),axis=1)
-
-    transformed_image = transform.warp(img, inverse_map=afine_tf)
+    im = np.asanyarray(img)                                      #ajout
+    transformed_image = transform.warp(im, inverse_map=afine_tf) #ajout, avant .warp(img,...)
     out=img_as_ubyte(transformed_image)
     out=Image.fromarray(out)
     width,height=out.size
